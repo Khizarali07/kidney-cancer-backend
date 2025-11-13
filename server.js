@@ -110,6 +110,12 @@ app.use((req, res, next) => {
 });
 
 // 3) ROUTES
+app.get("/", (req, res) => {
+  res.status(200).json({
+    status: "success",
+    message: "Kidney Cancer Detection API is running",
+  });
+});
 app.use("/api/v1/auth", authRouter);
 app.use("/api/v1/detection", detectionRouter);
 
