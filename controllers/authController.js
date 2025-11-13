@@ -260,3 +260,42 @@ export const getMe = async (req, res, next) => {
     next(err);
   }
 };
+
+export const updateMe = async (req, res, next) => {
+  try {
+    // 1) Create error if user POSTs password data
+    if (req.body.password || req.body.passwordConfirm) {
+      return next(
+        new AppError(
+          "This route is not for password updates. Please use /updateMyPassword.",
+          400
+        )
+      );
+    }
+
+    // 2) Filtered out unwanted fields names that are not allowed to be updated
+    const filteredBody = {
+      name: req.body.name,
+      email: req.body.email,
+    };
+
+    // 3) Update user document
+    const updatedUser = await User.findByIdAndUpdate(
+      req.user.id,
+      filteredBody,
+      {
+        new: true,
+        runValidators: true,
+      }
+    );
+
+    res.status(200).json({
+      status: "success",
+      data: {
+        user: updatedUser,
+      },
+    });
+  } catch (err) {
+    next(err);
+  }
+};

@@ -8,6 +8,7 @@ import {
   updatePassword,
   protect,
   getMe,
+  updateMe,
 } from "../controllers/authController.js";
 
 const router = express.Router();
@@ -23,5 +24,6 @@ router.get("/me", protect, getMe);
 
 // Protected routes
 router.post("/updateMyPassword", protect, updatePassword);
+router.patch("/updateMe", protect, updateMe);
 
 export default router;

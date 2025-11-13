@@ -11,6 +11,8 @@ import cookieParser from "cookie-parser";
 import compression from "compression";
 import morgan from "morgan";
 
+import AppError from "./utils/appError.js";
+
 // Routes
 import authRouter from "./routes/authRoutes.js";
 import detectionRouter from "./routes/detectionRoutes.js";
