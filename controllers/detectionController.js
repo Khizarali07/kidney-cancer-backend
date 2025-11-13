@@ -38,7 +38,8 @@ const upload = multer({
 export const uploadImage = upload.single("image");
 
 // --- Python Flask API URL (Updated to new unified API) ---
-const PYTHON_API_URL = "http://localhost:8000/api/v1/predict/image";
+const PYTHON_API_URL =
+  "https://khizarali07-kidney-cancer-backend.hf.space/api/v1/predict/image";
 
 // --- Main controller function to process image and get prediction ---
 export const processImage = async (req, res, next) => {
