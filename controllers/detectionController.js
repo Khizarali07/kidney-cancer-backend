@@ -83,11 +83,13 @@ export const processImage = async (req, res, next) => {
       headers: formData.getHeaders(),
     });
 
+    console.log("Response from Python API:", response.data);
+
     // 5) Clean up the temporary file after sending
     await fs.promises.unlink(tempFilePath);
 
     // Extract prediction from new API response structure
-    const predictionData = response.data.data?.prediction || response.data;
+    const predictionData = response.data.data;
 
     const detectionImage = new DetectionImages({
       image: req.file.buffer,
