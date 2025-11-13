@@ -37,8 +37,8 @@ const upload = multer({
 // --- Middleware to handle single file upload ---
 export const uploadImage = upload.single("image");
 
-// --- Python Flask API URL ---
-const PYTHON_API_URL = "http://localhost:8000/predict";
+// --- Python Flask API URL (Updated to new unified API) ---
+const PYTHON_API_URL = "http://localhost:8000/api/v1/predict/image";
 
 // --- Main controller function to process image and get prediction ---
 export const processImage = async (req, res, next) => {
@@ -85,10 +85,13 @@ export const processImage = async (req, res, next) => {
     // 5) Clean up the temporary file after sending
     await fs.promises.unlink(tempFilePath);
 
+    // Extract prediction from new API response structure
+    const predictionData = response.data.data?.prediction || response.data;
+
     const detectionImage = new DetectionImages({
       image: req.file.buffer,
-      prediction: response.data,
-      confidence: response.data.confidence,
+      prediction: predictionData,
+      confidence: predictionData.confidence,
       userId: req.user.id, // Use req.user.id directly
     });
 
@@ -103,7 +106,7 @@ export const processImage = async (req, res, next) => {
     res.status(200).json({
       status: "success",
       data: {
-        prediction: response.data,
+        prediction: predictionData,
       },
     });
   } catch (err) {
