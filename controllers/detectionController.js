@@ -4,6 +4,7 @@ import axios from "axios";
 import FormData from "form-data";
 import User from "../models/userModel.js";
 import DetectionImages from "../models/detectionImagesModel.js";
+import AppError from "../utils/appError.js";
 
 // --- Multer Configuration for memory storage ---
 const multerStorage = multer.memoryStorage();
@@ -108,18 +109,36 @@ export const handleMulterError = (err, req, res, next) => {
 };
 
 export const savePrediction = async (req, res, next) => {
-  const prediction = await DetectionImages.create({
-    prediction: req.body,
-    userId: req.user.id,
-  });
-  if (prediction) {
-    return res.status(200).json({
+  try {
+    const body = req.body || {};
+
+    // Expect payload from frontend: { formData, prediction, probability, confusion_matrix, precision, recall, ... }
+    const { formData, prediction, probability } = body;
+
+    if (!prediction) {
+      return next(new AppError("Missing 'prediction' in request body", 400));
+    }
+
+    const saved = await DetectionImages.create({
+      image: null,
+      prediction: {
+        ...body,
+        formData: formData || body.formData || null,
+      },
+      confidence: typeof probability === "number" ? probability : 0,
+      userId: req.user.id,
+    });
+
+    return res.status(201).json({
       status: "success",
       message: "Prediction saved successfully!",
+      data: {
+        prediction: saved,
+      },
     });
+  } catch (err) {
+    return next(err);
   }
-
-  next();
 };
 
 export const getDetections = async (req, res, next) => {
