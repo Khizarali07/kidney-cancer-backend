@@ -60,7 +60,16 @@ export default (err, req, res, next) => {
   if (process.env.NODE_ENV === "development") {
     sendErrorDev(err, res);
   } else if (process.env.NODE_ENV === "production") {
-    let error = { ...err };
+    // IMPORTANT: Many Error properties (message, name) are non-enumerable.
+    // Spreading `{ ...err }` drops them, and can also drop `isOperational`,
+    // causing expected 4xx errors to become generic 500s in production.
+    let error = {
+      ...err,
+      message: err.message,
+      name: err.name,
+      isOperational: err.isOperational,
+      stack: err.stack,
+    };
 
     if (error.name === "CastError") error = handleCastErrorDB(error);
     if (error.code === 11000) error = handleDuplicateFieldsDB(error);
